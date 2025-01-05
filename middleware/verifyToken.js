@@ -1,28 +1,33 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware para verificar el token y validar el rol de admin
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
+    // Obtenemos el token del encabezado Authorization (formato: "Bearer <token>")
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
 
     if (!token) {
-        return res.status(403).json({ message: "Acceso denegado. No se proporcionó un token." });
+        return res.status(403).json({ message: "Token no proporcionado" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ message: "Token no válido" });
+    try {
+        // Decodificamos el token usando la clave secreta
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Verificamos que el token contenga el 'id' en el payload
+        if (!decoded.id) {
+            return res.status(400).json({ message: "El token no contiene un id válido" });
         }
 
-        // Guardar datos decodificados del token en la solicitud para acceso futuro
-        req.userData = decoded;
+        // Agregamos el id al objeto req
+        req.userId = decoded.id;
 
-        // Verificar si el usuario tiene el rol de admin
-        if (req.userData.role !== 'admin') {
-            return res.status(403).json({ message: "Acceso denegado. Solo los administradores pueden crear productos." });
-        }
+        console.log('Token Decodificado:', decoded);  // Verifica el contenido del token decodificado
 
-        next(); // Si es admin, continúa con la siguiente acción
-    });
+        // Continuamos con la siguiente función
+        next();
+    } catch (error) {
+        console.error('Error al verificar el token:', error.message);
+        return res.status(401).json({ message: "Token inválido", error: error.message });
+    }
 };
 
 module.exports = verifyToken;
