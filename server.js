@@ -10,18 +10,18 @@ const app = express();
 
 app.use(express.json());
 
-// Función de reconexión con MongoDB
 const connectToDatabase = () => {
-    mongoose.connect(process.env.DB_URI, { 
+    mongoose.connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
-        .then(() => console.log('Base de datos conectada'))
-        .catch(err => {
-            console.log('Error de conexión a la base de datos, reintentando...', err);
-            setTimeout(connectToDatabase, 5000); // Reintentar después de 5 segundos
-        });
+    .then(() => console.log('Base de datos conectada'))
+    .catch(err => {
+        console.log('Error de conexión a la base de datos, reintentando...', err);
+        setTimeout(connectToDatabase, 5000); // Reintentar después de 5 segundos
+    });
 };
+
 
 // Conectar a la base de datos
 connectToDatabase();
