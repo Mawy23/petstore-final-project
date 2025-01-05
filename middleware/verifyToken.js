@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
         }
 
         // Agregamos el id al objeto req
-        req.userId = decoded.id;
+        req.userId = decoded.id; // Aquí asignamos el 'id' a 'req.userId'
 
         console.log('Token Decodificado:', decoded);  // Verifica el contenido del token decodificado
 

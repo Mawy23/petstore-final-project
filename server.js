@@ -7,6 +7,7 @@ const productRoutes = require('./routes/productRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const userRoutes = require('./routes/userRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 dotenv.config();
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);  // Cambiado a '/api/reviews' para mantener consistencia
 app.use('/api/users', userRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;
