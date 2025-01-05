@@ -27,6 +27,10 @@ exports.getProductById = async (req, res) => {
 exports.createProduct = async (req, res) => {
     const { name, description, price, category } = req.body;
 
+    if (!name || !price || !category) {
+        return res.status(400).json({ message: 'Faltan campos requeridos.' });
+    }
+
     try {
         const newProduct = new Product({ name, description, price, category });
         await newProduct.save();

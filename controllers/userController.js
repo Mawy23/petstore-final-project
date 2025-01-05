@@ -24,39 +24,37 @@ const login = async (req, res) => {
     }
 };
 
+// Función para registro de usuario
 const register = async (req, res) => {
     const { username, password, role = 'user' } = req.body;
 
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+        return res.status(400).json({ message: 'El usuario ya existe.' });
+    }
+
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear un nuevo usuario con el rol
+    const newUser = new User({ username, password: hashedPassword, role });
+
+    // Guardar el nuevo usuario en la base de datos
     try {
-        console.log('Buscando si el usuario ya existe...');
-        const userExists = await User.findOne({ username });
-        console.log("Usuario encontrado:", userExists);
-
-        if (userExists) {
-            console.log("El usuario ya existe.");
-            return res.status(400).json({ message: 'El usuario ya existe.' });
-        }
-
-        console.log('Creando nuevo usuario...');
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        const newUser = new User({ username, password: hashedPassword, role });
-        console.log("Nuevo usuario:", newUser);
-
         await newUser.save();
-        console.log("Usuario guardado correctamente.");
-
+        // Generar el token
         const token = jwt.sign(
-            { id: newUser._id, username, role: newUser.role },
+            { id: newUser._id, username: newUser.username, role: newUser.role },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-
-        res.status(201).json({ token });
+        res.status(201).json({ message: 'Usuario registrado con éxito', token });
     } catch (err) {
-        console.error("Error al registrar el usuario:", err.message);
         res.status(500).json({ message: 'Error al registrar el usuario', error: err.message });
     }
 };
+
 
 
 // Obtener perfil del usuario
