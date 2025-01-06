@@ -28,22 +28,17 @@ const login = async (req, res) => {
 const register = async (req, res) => {
     const { username, password, role = 'user' } = req.body;
 
-    // Verificar si el usuario ya existe
     const existingUser = await User.findOne({ username });
     if (existingUser) {
         return res.status(400).json({ message: 'El usuario ya existe.' });
     }
 
-    // Encriptar la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear un nuevo usuario con el rol
     const newUser = new User({ username, password: hashedPassword, role });
 
-    // Guardar el nuevo usuario en la base de datos
     try {
         await newUser.save();
-        // Generar el token
         const token = jwt.sign(
             { id: newUser._id, username: newUser.username, role: newUser.role },
             process.env.JWT_SECRET,
@@ -55,8 +50,6 @@ const register = async (req, res) => {
     }
 };
 
-
-
 // Obtener perfil del usuario
 const getProfile = (req, res) => {
     res.json({
@@ -65,4 +58,46 @@ const getProfile = (req, res) => {
     });
 };
 
-module.exports = { login, register, getProfile };
+// Actualizar usuario
+const updateUser = async (req, res) => {
+    const userId = req.userId;  // ID del usuario autenticado
+    const { username, password } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        if (username) user.username = username;
+        if (password) user.password = await bcrypt.hash(password, 10);
+
+        await user.save();
+
+        res.json({ message: 'Usuario actualizado con éxito', user });
+    } catch (err) {
+        res.status(500).json({ message: 'Error al actualizar usuario', error: err.message });
+    }
+};
+
+// Eliminar usuario
+const deleteUser = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        await User.findByIdAndDelete(userId);
+
+        res.json({ message: 'Usuario eliminado con éxito' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error al eliminar usuario', error: err.message });
+    }
+};
+
+module.exports = { login, register, getProfile, updateUser, deleteUser };

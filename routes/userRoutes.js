@@ -81,6 +81,50 @@ const router = express.Router();
  *         description: No autorizado
  */
 
+/**
+ * @swagger
+ * /api/users/update:
+ *   put:
+ *     summary: Actualizar usuario
+ *     description: Permite actualizar los datos del usuario autenticado.
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "nuevoUsuario"
+ *               password:
+ *                 type: string
+ *                 example: "nuevaContraseña"
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado con éxito
+ *       401:
+ *         description: No autorizado
+ *
+ * /api/users/delete:
+ *   delete:
+ *     summary: Eliminar usuario
+ *     description: Elimina el usuario autenticado.
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado con éxito
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
+router.put('/update', verifyToken, userController.updateUser);
+router.delete('/delete', verifyToken, userController.deleteUser);
 router.post('/login', userController.login);
 router.post('/register', userController.register);
 router.get('/profile', verifyToken, userController.getProfile);
