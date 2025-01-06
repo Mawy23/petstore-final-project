@@ -1,5 +1,5 @@
 const Review = require('../models/Review');
-const Product = require('../models/Product');  // Para verificar si el producto existe
+const Product = require('../models/Product');
 
 // Función para obtener reseñas de un producto
 exports.getReviewsByProduct = async (req, res) => {

@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Base de datos MongoDB compartida para todos los servicios
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -9,27 +10,84 @@ services:
     volumes:
       - mongo-data:/data/db
     networks:
-      - petstore-networks
+      - microservices-network
 
-  petstore:
-    build: .
-    container_name: petstore-app
+  # Microservicio de Usuarios
+  users-service:
+    build:
+      context: ./users-service
+    container_name: users-service
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/petstore
-    volumes:
-      - .:/usr/src/app
-    command: [ "node", "server.js" ]
     networks:
-      - petstore-networks
+      - microservices-network
+
+  # Microservicio de Pedidos
+  orders-service:
+    build:
+      context: ./orders-service
+    container_name: orders-service
+    ports:
+      - "3003:3000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/petstore
+    networks:
+      - microservices-network
+
+  # Microservicio de Productos
+  products-service:
+    build:
+      context: ./products-service
+    container_name: products-service
+    ports:
+      - "3004:3000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/petstore
+    networks:
+      - microservices-network
+
+  # Microservicio de Carrito
+  cart-service:
+    build:
+      context: ./cart-service
+    container_name: cart-service
+    ports:
+      - "3005:3000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/petstore
+    networks:
+      - microservices-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api_gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - users-service
+      - orders-service
+      - products-service
+      - cart-service
+    networks:
+      - microservices-network
+    volumes:
+      - ./api_gateway:/usr/src/app
 
 volumes:
   mongo-data:
 
-
 networks:
-  petstore-networks:
+  microservices-network:
     driver: bridge

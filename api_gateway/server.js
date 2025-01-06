@@ -3,11 +3,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const productRoutes = require('./routes/productRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
-const userRoutes = require('./routes/userRoutes');
-const cartRoutes = require('./routes/cartRoutes');
-const orderRoutes = require('./routes/orderRoutes');
 
 dotenv.config();
 const app = express();
@@ -18,9 +13,9 @@ app.use(express.json());
 const swaggerOptions = {
   swaggerDefinition: {
     info: {
-      title: 'Petstore API',
+      title: 'Petstore API - User Service',
       version: '1.0.0',
-      description: 'API for managing petstore',
+      description: 'API para la gestión de usuarios en Petstore',
     },
     host: 'localhost:3000', // Cambia esto si es necesario
     basePath: '/',
@@ -56,12 +51,6 @@ const connectToDatabase = () => {
 // Conectar a la base de datos
 connectToDatabase();
 
-// Rutas
-app.use('/api/products', productRoutes);
-app.use('/api/reviews', reviewRoutes);  // Cambiado a '/api/reviews' para mantener consistencia
-app.use('/api/users', userRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;
