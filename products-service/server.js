@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const reviewRoutes = require('./routes/reviewRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 dotenv.config();
 const app = express();
@@ -54,6 +55,7 @@ connectToDatabase();
 
 // Rutas
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/products', productRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;

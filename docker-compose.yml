@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Base de datos MongoDB compartida para todos los servicios
   mongodb:
@@ -18,11 +16,12 @@ services:
       context: ./users-service
     container_name: users-service
     ports:
-      - "3001:3000"
+      - "3001:3001"
     depends_on:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3001
     networks:
       - microservices-network
 
@@ -32,11 +31,12 @@ services:
       context: ./orders-service
     container_name: orders-service
     ports:
-      - "3003:3000"
+      - "3003:3003"
     depends_on:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3003
     networks:
       - microservices-network
 
@@ -46,11 +46,12 @@ services:
       context: ./products-service
     container_name: products-service
     ports:
-      - "3004:3000"
+      - "3004:3004"
     depends_on:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3004
     networks:
       - microservices-network
 
@@ -60,11 +61,12 @@ services:
       context: ./cart-service
     container_name: cart-service
     ports:
-      - "3005:3000"
+      - "3005:3005"
     depends_on:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3005
     networks:
       - microservices-network
 
@@ -74,12 +76,18 @@ services:
       context: ./api_gateway
     container_name: api-gateway
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       - users-service
       - orders-service
       - products-service
       - cart-service
+    environment:
+      USERS_SERVICE_URL: http://users-service:3001
+      ORDERS_SERVICE_URL: http://orders-service:3003
+      PRODUCTS_SERVICE_URL: http://products-service:3004
+      CART_SERVICE_URL: http://cart-service:3005
+      PORT: 8080
     networks:
       - microservices-network
     volumes:
