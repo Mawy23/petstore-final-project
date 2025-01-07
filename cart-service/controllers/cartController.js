@@ -1,10 +1,24 @@
 const Cart = require('../models/Cart');
+const axios = require('axios');
 
 exports.addItemToCart = async (req, res) => {
     const { productId, quantity } = req.body;
     const userId = req.userId; // Asumimos que el ID del usuario se obtiene del token
 
     try {
+        // Verificar disponibilidad del producto con el servicio de Productos
+        const productResponse = await axios.get(`http://products-service:3000/api/products/${productId}`);
+        const product = productResponse.data;
+
+        if (!product) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+
+        // Verificar si la cantidad solicitada está disponible
+        if (product.stock < quantity) {
+            return res.status(400).json({ message: "Cantidad solicitada no disponible" });
+        }
+
         let cart = await Cart.findOne({ userId });
 
         if (!cart) {
@@ -63,5 +77,23 @@ exports.removeItemFromCart = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: "Error al eliminar producto", error: error.message });
+    }
+};
+
+exports.clearCart = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const cart = await Cart.findOne({ userId });
+        if (!cart) {
+            return res.status(404).json({ message: "Carrito no encontrado" });
+        }
+
+        cart.items = [];
+        await cart.save();
+
+        res.status(200).json({ message: "Carrito limpiado", cart });
+    } catch (error) {
+        res.status(500).json({ message: "Error al limpiar el carrito", error: error.message });
     }
 };

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const productRoutes = require('./routes/productRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 dotenv.config();
 const app = express();
@@ -53,7 +53,7 @@ const connectToDatabase = () => {
 connectToDatabase();
 
 // Rutas
-app.use('/api/products', productRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;

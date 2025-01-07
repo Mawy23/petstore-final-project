@@ -62,4 +62,6 @@ const verifyToken = require('../middleware/verifyToken');
  */
 router.post('/', verifyToken, orderController.createOrder);
 
+router.get('/user/:userId', orderController.getOrdersByUser); // Nueva ruta
+
 module.exports = router;

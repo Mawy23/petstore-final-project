@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const axios = require('axios'); // Importamos axios para hacer peticiones HTTP
 const User = require('../models/User');  // Importamos el modelo de usuario
 
 // Función para login
@@ -100,4 +101,30 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { login, register, getProfile, updateUser, deleteUser };
+
+// Función para obtener las órdenes de un usuario
+const getUserOrders = async (req, res) => {
+    const userId = req.userId; // El ID del usuario debería venir del middleware verifyToken
+
+    try {
+        // Aquí llamamos al servicio de órdenes
+        const orders = await axios.get(`http://orders-service:3003/api/orders/user/${userId}`);
+        res.json({ orders: orders.data });
+    } catch (error) {
+        console.error('Error al obtener las órdenes:', error.message);
+        res.status(500).json({ message: 'Error al obtener las órdenes', error: error.message });
+    }
+};
+
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los usuarios', error: error.message });
+    }
+}
+
+
+
+module.exports = { login, register, getProfile, updateUser, deleteUser, getUserOrders, getUsers };

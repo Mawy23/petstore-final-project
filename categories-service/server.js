@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoriesRoutes'); // Cambiado de reviewRoutes a categoryRoutes
 
 dotenv.config();
 const app = express();
@@ -53,7 +53,7 @@ const connectToDatabase = () => {
 connectToDatabase();
 
 // Rutas
-app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes); // Agregado el middleware de rutas
 
 // Puerto
 const PORT = process.env.PORT || 3000;

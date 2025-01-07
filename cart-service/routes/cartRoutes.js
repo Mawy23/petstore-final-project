@@ -84,4 +84,7 @@ router.get('/', verifyToken, cartController.getCart);
  */
 router.delete('/items/:itemId', verifyToken, cartController.removeItemFromCart);
 
+// Nueva ruta para limpiar el carrito
+router.delete('/clear', verifyToken, cartController.clearCart);
+
 module.exports = router;

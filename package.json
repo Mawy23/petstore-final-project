@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Mawy23/petstore-final-project#readme",
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "dotenv": "^16.4.7",

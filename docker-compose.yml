@@ -70,6 +70,36 @@ services:
     networks:
       - microservices-network
 
+  #Microservicio de Reviews
+  reviews-service:
+    build:
+      context: ./reviews-service
+    container_name: reviews-service
+    ports:
+      - "3006:3006"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3006
+    networks:
+      - microservices-network
+
+  #Microservicio de Categorias
+  categories-service:
+    build:
+      context: ./categories-service
+    container_name: categories-service
+    ports:
+      - "3007:3007"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/petstore
+      PORT: 3007
+    networks:
+      - microservices-network
+
   # API Gateway
   api-gateway:
     build:

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const verifyToken = require('../middleware/verifyToken');
+const axios = require('axios');
 
 /**
  * @swagger
@@ -168,10 +169,38 @@ const verifyToken = require('../middleware/verifyToken');
  *         description: Producto no encontrado
  */
 
+/**
+ * @swagger
+ * /api/products/{id}/details:
+ *   get:
+ *     summary: Obtener detalles del producto con resumen de reseñas
+ *     description: Retorna los detalles de un producto específico junto con un resumen de las reseñas.
+ *     tags: [Productos]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del producto
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalles del producto con resumen de reseñas
+ *       404:
+ *         description: Producto no encontrado
+ */
+
+// Rutas para productos
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-router.post('/', verifyToken, productController.createProduct);
+router.post('/', productController.createProduct);
 router.put('/:id', productController.updateProduct);
 router.delete('/:id', productController.deleteProduct);
+
+// Nueva ruta para obtener detalles del producto con resumen de reseñas
+router.get('/:id/details', productController.getProductDetailsWithReviews);
+
+// Nueva ruta para actualizar el stock de un producto
+router.put('/:id/update-stock', productController.updateProductStock);
 
 module.exports = router;

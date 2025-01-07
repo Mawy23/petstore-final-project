@@ -128,5 +128,9 @@ router.delete('/delete', verifyToken, userController.deleteUser);
 router.post('/login', userController.login);
 router.post('/register', userController.register);
 router.get('/profile', verifyToken, userController.getProfile);
+router.get('/', userController.getUsers);
+
+// Nueva ruta para obtener los pedidos del usuario
+router.get('/orders', verifyToken, userController.getUserOrders);
 
 module.exports = router;

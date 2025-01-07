@@ -61,12 +61,34 @@ const router = express.Router();
  *           type: string
  *     responses:
  *       200:
- *         description: Lista de reseñas
+ *         description: Lista de reseñas    
+ *       404:
+ *         description: Producto no encontrado
+ */
+
+/**
+ * @swagger
+ * /api/reviews/summary/{productId}:
+ *   get:
+ *     summary: Obtener resumen de reseñas por producto
+ *     description: Retorna un resumen de las reseñas de un producto específico.
+ *     tags: [Reseñas]
+ *     parameters:
+ *       - name: productId
+ *         in: path
+ *         required: true
+ *         description: ID del producto
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Resumen de reseñas
  *       404:
  *         description: Producto no encontrado
  */
 
 router.post('/', verifyToken, reviewController.createReview);
-router.get('/:productId', reviewController.getReviewsByProduct);
+router.get('/:productId/reviews', reviewController.getReviewsByProduct);
+router.get('/summary/:productId', reviewController.getReviewsSummaryByProduct);
 
 module.exports = router;
