@@ -203,4 +203,19 @@ router.get('/:id/details', productController.getProductDetailsWithReviews);
 // Nueva ruta para actualizar el stock de un producto
 router.put('/:id/update-stock', productController.updateProductStock);
 
+// Ruta para obtener un producto por su ID
+router.get('/:productId', async (req, res) => {
+    const { productId } = req.params;
+    
+    try {
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+        res.json(product);  // Retorna el producto si lo encuentra
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el producto', error: error.message });
+    }
+});
+
 module.exports = router;
