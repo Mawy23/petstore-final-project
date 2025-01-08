@@ -7,7 +7,7 @@ exports.addItemToCart = async (req, res) => {
 
     try {
         // Verificar disponibilidad del producto con el servicio de Productos
-        const productResponse = await axios.get(`http://products-service:3000/api/products/${productId}`);
+        const productResponse = await axios.get(`http://products-service:3004/api/products/${productId}`);
         const product = productResponse.data;
 
         if (!product) {
@@ -46,12 +46,24 @@ exports.getCart = async (req, res) => {
     const userId = req.userId;
 
     try {
-        const cart = await Cart.findOne({ userId }).populate('items.productId');
+        const cart = await Cart.findOne({ userId });
         if (!cart) {
             return res.status(404).json({ message: "Carrito vacío" });
         }
 
-        res.status(200).json(cart);
+        // Obtener detalles de cada producto desde el servicio de productos
+        const populatedItems = await Promise.all(
+            cart.items.map(async (item) => {
+                const productResponse = await axios.get(`http://products-service:3004/api/products/${item.productId}`);
+                const product = productResponse.data;
+                return {
+                    product,
+                    quantity: item.quantity
+                };
+            })
+        );
+
+        res.status(200).json({ cart: populatedItems });
     } catch (error) {
         res.status(500).json({ message: "Error al obtener el carrito", error: error.message });
     }

@@ -1,32 +1,32 @@
 const Order = require('../models/Order');
 const axios = require('axios');
 
+
 const createOrder = async (req, res) => {
     try {
         const { shippingAddress, paymentMethod } = req.body;
         const userId = req.userId;
 
-        // Verificar la dirección con el servicio de Usuarios
-        const userResponse = await axios.get(`http://users-service:3005/api/users/profile`, {
+        // Obtener los items del Carrito
+        const cartResponse = await axios.get(`http://cart-service:3005/api/cart`, {
             headers: { Authorization: req.headers.authorization }
         });
-        const user = userResponse.data.user;
-        if (user.address !== shippingAddress) {
-            return res.status(400).json({ message: 'Dirección de envío no coincide con la registrada' });
+
+        // Verifica si cart.items está presente y tiene elementos
+        const cart = cartResponse.data;
+        if (!cart || !cart.cart || cart.cart.length === 0) {
+            return res.status(400).json({ message: 'El carrito está vacío o no se pudo obtener los items' });
         }
 
-        // Obtener los items del Carrito
-        const cartResponse = await axios.get(`http://cart-service:3002/api/cart`, {
-            headers: { Authorization: req.headers.authorization }
-        });
-        const cart = cartResponse.data;
-        if (!cart.items.length) {
-            return res.status(400).json({ message: 'El carrito está vacío' });
-        }
+        // Mapea los items para tener el formato esperado por el servicio de pedidos
+        const items = cart.cart.map(item => ({
+            productId: item.product._id,  // Asumiendo que cada item tiene un objeto 'product'
+            quantity: item.quantity
+        }));
 
         // Actualizar el inventario en el servicio de Productos
-        for (const item of cart.items) {
-            await axios.put(`http://products-service:3000/api/products/${item.productId}/update-stock`, {
+        for (const item of items) {
+            await axios.put(`http://products-service:3004/api/products/${item.productId}/update-stock`, {
                 quantity: -item.quantity
             });
         }
@@ -36,14 +36,14 @@ const createOrder = async (req, res) => {
             userId,
             shippingAddress,
             paymentMethod,
-            items: cart.items
+            items
         });
 
         // Guardar el pedido en la base de datos
         await order.save();
 
         // Limpiar el carrito
-        await axios.delete(`http://cart-service:3002/api/cart/clear`, {
+        await axios.delete(`http://cart-service:3005/api/cart/clear`, {
             headers: { Authorization: req.headers.authorization }
         });
 
@@ -53,12 +53,15 @@ const createOrder = async (req, res) => {
             order
         });
     } catch (err) {
+        console.error(err);  // Log del error para depuración
         res.status(500).json({
             message: 'Error al crear el pedido',
             error: err.message
         });
     }
 };
+
+
 
 // Función para obtener las órdenes de un usuario
 const getOrdersByUser = async (req, res) => {
